@@ -136,7 +136,7 @@ foreach ($username in $selectedUsers) {
     
     # Start the process with credentials
     Write-Host "[🚀] Running '$adsFile`:$adsStream' as user '$username'"
-    $process = Start-Process -FilePath "$adsFile`:$adsStream" -Credential (New-Object System.Management.Automation.PSCredential ($username, $password)) -PassThru -NoNewWindow -ErrorAction SilentlyContinue
+    $process = Start-Process -FilePath "$adsFile`:$adsStream" -WorkingDirectory (Split-Path -Parent $RoWin.DisplayIcon) -Credential (New-Object System.Management.Automation.PSCredential ($username, $password)) -PassThru -NoNewWindow -ErrorAction SilentlyContinue
     
     # Rename the window after ensuring the process exists    
     Set-WindowTitle -newTitle "$username" -processId $process.Id
