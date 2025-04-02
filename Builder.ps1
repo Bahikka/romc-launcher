@@ -51,7 +51,7 @@ $scriptContent | Out-File -FilePath $tempScriptPath -Encoding UTF8
 Invoke-PS2EXE -InputFile $tempScriptPath -OutputFile ($env:USERPROFILE + '\Desktop\ROMC - Launcher.exe') `
     -iconFile ($exeDirectory + '\res\icon\Icon.ico') `
     -version '1' -title 'ROMC:MC' -product 'ROMC - Multi Client' `
-    -requireAdmin -STA -verbose
+    -noConsole -noOutput -noError -requireAdmin -STA | Out-Null
 
 # Remove the temporary file
 Remove-Item $tempScriptPath
