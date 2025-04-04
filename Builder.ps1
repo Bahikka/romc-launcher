@@ -21,6 +21,11 @@ $exeDirectory = Split-Path -Parent $RoWin.DisplayIcon
 
 # Ensure Invoke-PS2EXE is available
 if (-not (Get-Command Invoke-PS2EXE -ErrorAction SilentlyContinue)) {
+    $nuget = Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue -Force
+    if (-not $nuget -or $nuget.Version -lt [Version]"2.8.5.201") {
+        $env:__SuppressPromptForNuGet = "true"
+        Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -ForceBootstrap -Scope CurrentUser
+    }
     Write-Host "[⚙️] Invoke-PS2EXE not found. Installing..."
     try {
         Install-Module -Name PS2EXE -Scope CurrentUser -Force -AllowClobber -ErrorAction Stop
