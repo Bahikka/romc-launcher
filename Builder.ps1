@@ -53,7 +53,7 @@ $tempScriptPath = [System.IO.Path]::GetTempFileName() -replace '\.tmp$', '.ps1'
 $scriptContent | Out-File -FilePath $tempScriptPath -Encoding UTF8
 
 # Convert the temporary script to an executable using Invoke-PS2EXE
-Invoke-PS2EXE -InputFile $tempScriptPath -OutputFile ($env:USERPROFILE + '\Desktop\ROMC - Launcher.exe') `
+Invoke-PS2EXE -InputFile $tempScriptPath -OutputFile ([Environment]::GetFolderPath([Environment+SpecialFolder]::Desktop) + '\ROMC - Launcher.exe') `
     -iconFile ($exeDirectory + '\res\icon\Icon.ico') `
     -version '1' -title 'ROMC:MC' -product 'ROMC - Multi Client' `
     -noConsole -noOutput -noError -requireAdmin -STA | Out-Null
