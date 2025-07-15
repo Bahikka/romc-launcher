@@ -1,16 +1,9 @@
 # Import Security Module (for Credential Handling)
 Import-Module -Name “C:\Windows\SysWOW64\WindowsPowerShell\v1.0\Modules\Microsoft.PowerShell.Security\Microsoft.PowerShell.Security.psd1” -Force
 
-# Function to get installed applications (Optimized Single Query)
-function Get-InstalledApp {
-    $uninstallKeys = @(
-        "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*",
-        "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*",
-        "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*"
-    )
-    $Apps = $uninstallKeys | ForEach-Object { Get-ItemProperty $_ -ErrorAction SilentlyContinue }
-    return $Apps | Where-Object { $_.DisplayName -like 'RO_win*' }
-}
+# Load shared utilities
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+. "$scriptDir\Utility.ps1"
 
 # Define paths dynamically based on the installed application
 Write-Host "[🔍] Searching for installed RO_win..."
