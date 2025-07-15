@@ -1,13 +1,28 @@
-# Function to get installed applications (Optimized Single Query)
-function Get-InstalledApp {
-    $uninstallKeys = @(
-        "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*",
-        "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*",
-        "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*"
-    )
-    $Apps = $uninstallKeys | ForEach-Object { Get-ItemProperty $_ -ErrorAction SilentlyContinue }
-    return $Apps | Where-Object { $_.DisplayName -like 'RO_win*' }
+param(
+    [Parameter(ValueFromPipeline=$true)]
+    [string]$Path
+)
+
+# Import shared utility functions
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+. "$scriptDir\Utility.ps1"
+
+begin {
+    $received = $null
 }
+
+process {
+    if ($Path) { $received = $Path }
+    elseif ($_) { $received = $_ }
+}
+
+end {
+    if (-not $received) {
+        Write-Error 'No script path provided to Builder.'
+        return
+    }
+
+    # Locate installed RO_win using shared utility
 
 # Define paths dynamically based on the installed application
 Write-Host "[🔍] Searching for installed RO_win..."
@@ -37,16 +52,13 @@ if (-not (Get-Command Invoke-PS2EXE -ErrorAction SilentlyContinue)) {
     }
 }
 
-# Download script content from GitHub
-$remoteScriptUrl = "https://raw.githubusercontent.com/Bahikka/romc-launcher/main/Launcher.ps1"
-try {
-    Write-Host "[🌐] Downloading script from GitHub..."
-    $scriptContent = Invoke-WebRequest -Uri $remoteScriptUrl -UseBasicParsing
-    $scriptContent = $scriptContent.Content
-} catch {
-    Write-Host "[❌] Failed to download the script: $_"
-    exit 1
-}
+# Retrieve script content from the provided path
+    try {
+        $scriptContent = Get-ScriptContent -Source $received
+    } catch {
+        Write-Host "[❌] Failed to obtain the script: $_"
+        return
+    }
 
 # Create a temporary file with a .ps1 extension
 $tempScriptPath = [System.IO.Path]::GetTempFileName() -replace '\.tmp$', '.ps1'
@@ -62,3 +74,5 @@ Invoke-PS2EXE -InputFile $tempScriptPath -OutputFile ([Environment]::GetFolderPa
 Remove-Item $tempScriptPath
 
 Write-Host "✅ Conversion complete. ROMC:MC has been created."
+
+}
